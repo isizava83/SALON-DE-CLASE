@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduTrabajo - Aulas Virtuales</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            pri: { 50:'#f0fdfa',100:'#ccfbf1',200:'#99f6e4',300:'#5eead4',400:'#2dd4bf',500:'#14b8a6',600:'#0d9488',700:'#0f766e',800:'#115e59',900:'#134e4a' },
+            acc: { 50:'#fff7ed',100:'#ffedd5',200:'#fed7aa',300:'#fdba74',400:'#fb923c',500:'#f97316',600:'#ea580c' },
+            g1:{400:'#60a5fa',500:'#3b82f6',600:'#2563eb'}, g2:{400:'#a78bfa',500:'#8b5cf6',600:'#7c3aed'}, g3:{400:'#f472b6',500:'#ec4899',600:'#db2777'}, g4:{400:'#fb923c',500:'#f97316',600:'#ea580c'}, g5:{400:'#34d399',500:'#10b981',600:'#059669'}
+          },
+          fontFamily: { inter: ['Inter','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    *{font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#f0fdfa}::-webkit-scrollbar-thumb{background:#99f6e4;border-radius:4px}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes scaleIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+    @keyframes slideR{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .fade-in{animation:fadeIn .5s ease forwards}.scale-in{animation:scaleIn .3s ease forwards}.slide-r{animation:slideR .4s ease forwards}
+    .float-anim{animation:float 3s ease-in-out infinite}
+    .drag-over{border-color:#0d9488!important;background:#f0fdfa!important;transform:scale(1.01)}
+    .toast{position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 20px;border-radius:12px;color:#fff;font-weight:500;font-size:13px;transform:translateY(100px);opacity:0;transition:all .4s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:8px}
+    .toast.show{transform:translateY(0);opacity:1}
+    .toast-success{background:linear-gradient(135deg,#0d9488,#14b8a6)}.toast-error{background:linear-gradient(135deg,#ef4444,#f87171)}.toast-info{background:linear-gradient(135deg,#3b82f6,#60a5fa)}
+    .modal-bg{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+    .modal-bg.active{opacity:1;pointer-events:all}
+    .modal-box{background:#fff;border-radius:20px;max-width:560px;width:95%;max-height:90vh;overflow-y:auto;transform:scale(.9);transition:transform .3s}
+    .modal-bg.active .modal-box{transform:scale(1)}
+    .page{display:none}.page.active{display:block}
+    .sidebar-link{transition:all .2s}.sidebar-link:hover,.sidebar-link.active{background:rgba(255,255,255,.15);border-radius:12px}
+    .grade-card{transition:all .3s}.grade-card:hover{transform:translateY(-4px);box-shadow:0 20px 40px -12px rgba(0,0,0,.1)}
+    input:focus,select:focus,textarea:focus{outline:none;ring:2px;border-color:#0d9488;box-shadow:0 0 0 3px rgba(13,148,136,.1)}
+    .badge-new{animation:float 2s ease-in-out infinite}
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen">
+
+<!-- ========== AUTH PAGE ========== -->
+<div id="authPage" class="min-h-screen flex">
+  <!-- Left Panel -->
+  <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-pri-700 via-pri-600 to-pri-500 relative overflow-hidden flex-col justify-between p-12 text-white">
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute top-20 left-10 w-64 h-64 border-2 border-white rounded-full"></div>
+      <div class="absolute bottom-20 right-10 w-96 h-96 border-2 border-white rounded-full"></div>
+      <div class="absolute top-1/2 left-1/3 w-48 h-48 border border-white rounded-full"></div>
+    </div>
+    <div class="relative z-10">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+          <span class="iconify text-xl" data-icon="lucide:graduation-cap"></span>
+        </div>
+        <span class="text-xl font-bold">EduTrabajo</span>
+      </div>
+      <p class="text-pri-200 text-sm mt-1">Educación para el Trabajo</p>
+    </div>
+    <div class="relative z-10 space-y-6">
+      <h2 class="text-3xl font-bold leading-tight">Tu salón virtual<br>de 1° a 5° de<br>secundaria</h2>
+      <p class="text-pri-200 text-sm leading-relaxed max-w-sm">Plataforma gratuita donde docentes y estudiantes comparten materiales, organizados por grado y sección.</p>
+      <div class="flex gap-4 pt-2">
+        <div class="text-center"><p class="text-2xl font-bold">5</p><p class="text-[10px] text-pri-200 uppercase tracking-wider">Grados</p></div>
+        <div class="w-px bg-white/20"></div>
+        <div class="text-center"><p class="text-2xl font-bold">∞</p><p class="text-[10px] text-pri-200 uppercase tracking-wider">Secciones</p></div>
+        <div class="w-px bg-white/20"></div>
+        <div class="text-center"><p class="text-2xl font-bold">0</p><p class="text-[10px] text-pri-200 uppercase tracking-wider">Costo</p></div>
+      </div>
+    </div>
+    <div class="relative z-10 text-xs text-pri-300">© 2025 EduTrabajo — 100% Gratuito</div>
+  </div>
+  <!-- Right Panel -->
+  <div class="flex-1 flex items-center justify-center p-8">
+    <div class="w-full max-w-md">
+      <div class="lg:hidden flex items-center gap-3 mb-8">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-pri-500 to-pri-700 flex items-center justify-center">
+          <span class="iconify text-white text-lg" data-icon="lucide:graduation-cap"></span>
+        </div>
+        <span class="text-lg font-bold text-pri-800">Edu<span class="text-acc-500">Trabajo</span></span>
+      </div>
+
+      <!-- Login Form -->
+      <div id="loginForm">
+        <h1 class="text-2xl font-bold text-gray-900 mb-1">Bienvenido de vuelta</h1>
+        <p class="text-sm text-gray-400 mb-8">Ingresa a tu aula virtual</p>
+        <div class="space-y-4">
+          <div>
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Usuario</label>
+            <div class="relative">
+              <span class="iconify absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" data-icon="lucide:user"></span>
+              <input type="text" id="loginUser" placeholder="Tu usuario" class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:border-pri-500 transition">
+            </div>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Contraseña</label>
+            <div class="relative">
+              <span class="iconify absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" data-icon="lucide:lock"></span>
+              <input type="password" id="loginPass" placeholder="Tu contraseña" class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:border-pri-500 transition" onkeydown="if(event.key==='Enter')doLogin()">
+            </div>
+          </div>
+          <button onclick="doLogin()" class="w-full py-3.5 bg-gradient-to-r from-pri-600 to-pri-700 text-white font-semibold text-sm rounded-xl hover:shadow-lg hover:shadow-pri-200 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2">
+            <span class="iconify" data-icon="lucide:log-in"></span> Iniciar Sesión
+          </button>
+        </div>
+        <p class="text-sm text-gray-400 text-center mt-6">¿No tienes cuenta? <button onclick="showRegister()" class="text-pri-600 font-semibold hover:underline">Regístrate aquí</button></p>
+        <div class="mt-4 p-3 bg-pri-50 rounded-xl">
+          <p class="text-[11px] text-pri-700 font-medium mb-1">🔑 Credenciales de admin:</p>
+          <p class="text-[11px] text-pri-600">Usuario: <strong>admin</strong> · Contraseña: <strong>admin123</strong></p>
+        </div>
+      </div>
+
+      <!-- Register Form -->
+      <div id="registerForm" class="hidden">
+        <h1 class="text-2xl font-bold text-gray-900 mb-1">Crear cuenta</h1>
+        <p class="text-sm text-gray-400 mb-8">Regístrate para acceder a tu aula</p>
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Nombre</label>
+              <input type="text" id="regName" placeholder="Tu nombre" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:border-pri-500 transition">
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Apellido</label>
+              <input type="text" id="regLast" placeholder="Tu apellido" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:border-pri-500 transition">
+            </div>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Usuario</label>
+            <input type="text" id="regUser" placeholder="Elige un usuario" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:border-pri-500 transition">
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Contraseña</label>
+            <input type="password" id="regPass" placeholder="Crea una contraseña" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:border-pri-500 transition">
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Grado</label>
+            <select id="regGrade" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:border-pri-500 transition">
+              <option value="">Selecciona tu grado</option>
+              <option value="1">1° de Secundaria</option>
+              <option value="2">2° de Secundaria</option>
+              <option value="3">3° de Secundaria</option>
+              <option value="4">4° de Secundaria</option>
+              <option value="5">5° de Secundaria</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Sección</label>
+            <select id="regSection" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:border-pri-500 transition">
+              <option value="">Primero selecciona un grado</option>
+            </select>
+          </div>
+          <button onclick="doRegister()" class="w-full py-3.5 bg-gradient-to-r from-pri-600 to-pri-700 text-white font-semibold text-sm rounded-xl hover:shadow-lg hover:shadow-pri-200 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2">
+            <span class="iconify" data-icon="lucide:user-plus"></span> Crear Cuenta
+          </button>
+        </div>
+        <p class="text-sm text-gray-400 text-center mt-6">¿Ya tienes cuenta? <button onclick="showLogin()" class="text-pri-600 font-semibold hover:underline">Inicia sesión</button></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ADMIN DASHBOARD ========== -->
+<div id="adminDashboard" class="hidden min-h-screen bg-gray-50">
+  <!-- Admin Sidebar -->
+  <aside id="adminSidebar" class="fixed left-0 top-0 bottom-0 w-64 bg-gradient-to-b from-pri-800 to-pri-900 text-white z-50 flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0">
+    <div class="p-5 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center"><span class="iconify text-lg" data-icon="lucide:graduation-cap"></span></div>
+        <div><p class="font-bold text-sm">EduTrabajo</p><p class="text-[10px] text-pri-300">Panel de Administración</p></div>
+      </div>
+    </div>
+    <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+      <button onclick="adminNav('overview')" class="sidebar-link active w-full flex items-center gap-3 px-4 py-3 text-sm text-left" data-nav="overview">
+        <span class="iconify" data-icon="lucide:layout-dashboard"></span> Inicio
+      </button>
+      <button onclick="adminNav('grades')" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-sm text-left" data-nav="grades">
+        <span class="iconify" data-icon="lucide:school"></span> Gestión de Aulas
+      </button>
+      <button onclick="adminNav('files')" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-sm text-left" data-nav="files">
+        <span class="iconify" data-icon="lucide:folder-up"></span> Subir Archivos
+      </button>
+      <button onclick="adminNav('students')" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-sm text-left" data-nav="students">
+        <span class="iconify" data-icon="lucide:users"></span> Estudiantes
+      </button>
+    </nav>
+    <div class="p-4 border-t border-white/10">
+      <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-pri-300 hover:text-white rounded-xl hover:bg-white/10 transition">
+        <span class="iconify" data-icon="lucide:log-out"></span> Cerrar Sesión
+      </button>
+    </div>
+  </aside>
+
+  <!-- Admin Main -->
+  <main class="lg:ml-64 min-h-screen">
+    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar('adminSidebar')" class="lg:hidden w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center"><span class="iconify text-gray-600" data-icon="lucide:menu"></span></button>
+        <h2 class="text-lg font-bold text-gray-800" id="adminTitle">Panel de Administración</h2>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-semibold text-pri-600 bg-pri-50 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+          <span class="iconify" data-icon="lucide:shield-check"></span> Administrador
+        </span>
+      </div>
+    </header>
+
+    <!-- Admin: Overview -->
+    <div id="admin-overview" class="page active p-6 fade-in">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-2xl p-5 border border-gray-100"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center"><span class="iconify text-blue-500" data-icon="lucide:school"></span></div></div><p class="text-2xl font-bold text-gray-800" id="statGrades">5</p><p class="text-xs text-gray-400">Grados activos</p></div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-100"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center"><span class="iconify text-purple-500" data-icon="lucide:layers"></span></div></div><p class="text-2xl font-bold text-gray-800" id="statSections">0</p><p class="text-xs text-gray-400">Secciones creadas</p></div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-100"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-xl bg-pri-100 flex items-center justify-center"><span class="iconify text-pri-500" data-icon="lucide:users"></span></div></div><p class="text-2xl font-bold text-gray-800" id="statStudentsAdmin">0</p><p class="text-xs text-gray-400">Estudiantes</p></div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-100"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-xl bg-acc-100 flex items-center justify-center"><span class="iconify text-acc-500" data-icon="lucide:file-stack"></span></div></div><p class="text-2xl font-bold text-gray-800" id="statFilesAdmin">0</p><p class="text-xs text-gray-400">Archivos subidos</p></div>
+      </div>
+      <div class="bg-white rounded-2xl border border-gray-100 p-6">
+        <h3 class="font-bold text-gray-800 mb-4">Estructura de Aulas</h3>
+        <div id="overviewTree" class="space-y-3"></div>
+      </div>
+    </div>
+
+    <!-- Admin: Grades -->
+    <div id="admin-grades" class="page p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div><h3 class="text-xl font-bold text-gray-800">Gestión de Aulas</h3><p class="text-sm text-gray-400">Crea y administra secciones por grado</p></div>
+      </div>
+      <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6" id="gradesGrid"></div>
+    </div>
+
+    <!-- Admin: Files -->
+    <div id="admin-files" class="page p-6">
+      <div class="mb-6"><h3 class="text-xl font-bold text-gray-800">Subir Archivos</h3><p class="text-sm text-gray-400">Selecciona el aula y sube materiales</p></div>
+      <div class="grid lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-1 space-y-4">
+          <div class="bg-white rounded-2xl border border-gray-100 p-5">
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Grado</label>
+            <select id="upGrade" onchange="loadSectionsForUpload()" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm mb-4">
+              <option value="">Seleccionar grado</option>
+              <option value="1">1° Secundaria</option><option value="2">2° Secundaria</option><option value="3">3° Secundaria</option><option value="4">4° Secundaria</option><option value="5">5° Secundaria</option>
+            </select>
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Sección</label>
+            <select id="upSection" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm mb-4">
+              <option value="">Primero selecciona grado</option>
+            </select>
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Descripción</label>
+            <textarea id="upDesc" rows="2" placeholder="Descripción del material..." class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none mb-4"></textarea>
+          </div>
+        </div>
+        <div class="lg:col-span-2">
+          <div id="adminDropZone" class="bg-white rounded-2xl border-2 border-dashed border-pri-200 p-10 text-center cursor-pointer hover:border-pri-400 hover:bg-pri-50/30 transition-all duration-300" onclick="document.getElementById('adminFileInput').click()">
+            <input type="file" id="adminFileInput" multiple class="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.txt">
+            <div id="adminDropContent">
+              <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-pri-100 flex items-center justify-center"><span class="iconify text-3xl text-pri-500" data-icon="lucide:upload-cloud"></span></div>
+              <p class="font-semibold text-gray-700 mb-1">Arrastra archivos aquí</p>
+              <p class="text-sm text-gray-400">PDF, DOC, PPT, XLS, Imágenes, TXT</p>
+            </div>
+            <div id="adminUploadProgress" class="hidden">
+              <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-pri-100 flex items-center justify-center"><span class="iconify text-2xl text-pri-500 animate-spin" data-icon="lucide:loader-2" id="adminUpSpinner"></span></div>
+              <p class="text-sm font-semibold text-gray-700 mb-2" id="adminUpText">Subiendo...</p>
+              <div class="w-48 mx-auto bg-gray-100 rounded-full h-2 overflow-hidden"><div class="bg-gradient-to-r from-pri-500 to-acc-400 h-full rounded-full transition-all duration-300" id="adminUpBar" style="width:0%"></div></div>
+            </div>
+          </div>
+          <div id="adminFilePreview" class="mt-4 space-y-2"></div>
+          <div id="adminUploadBtn" class="hidden mt-4 flex justify-end">
+            <button onclick="doAdminUpload()" class="px-6 py-2.5 bg-gradient-to-r from-pri-600 to-pri-700 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-pri-200 transition-all flex items-center gap-2">
+              <span class="iconify" data-icon="lucide:check"></span> Publicar Archivos
+            </button>
+          </div>
+          <!-- Existing files list -->
+          <div class="mt-8">
+            <h4 class="font-bold text-gray-800 mb-4">Archivos subidos</h4>
+            <div id="adminFilesList" class="space-y-2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin: Students -->
+    <div id="admin-students" class="page p-6">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+        <div><h3 class="text-xl font-bold text-gray-800">Estudiantes Registrados</h3><p class="text-sm text-gray-400">Gestiona los estudiantes por aula</p></div>
+        <div class="flex gap-2">
+          <select id="filterStuGrade" onchange="renderStudentsAdmin()" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm">
+            <option value="all">Todos los grados</option>
+            <option value="1">1° Secundaria</option><option value="2">2° Secundaria</option><option value="3">3° Secundaria</option><option value="4">4° Secundaria</option><option value="5">5° Secundaria</option>
+          </select>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b border-gray-100">
+              <tr><th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Nombre</th><th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Usuario</th><th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Grado</th><th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Sección</th><th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Estado</th><th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Acciones</th></tr>
+            </thead>
+            <tbody id="studentsTableBody"></tbody>
+          </table>
+        </div>
+        <div id="noStudents" class="hidden text-center py-12 text-gray-400 text-sm">No hay estudiantes registrados</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ========== STUDENT DASHBOARD ========== -->
+<div id="studentDashboard" class="hidden min-h-screen bg-gray-50">
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-6 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-pri-500 to-pri-700 flex items-center justify-center"><span class="iconify text-white text-sm" data-icon="lucide:graduation-cap"></span></div>
+      <span class="font-bold text-pri-800 text-sm">Edu<span class="text-acc-500">Trabajo</span></span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-xs font-medium text-gray-500" id="stuInfoBadge"></span>
+      <button onclick="logout()" class="text-xs font-semibold text-red-500 hover:text-red-600 flex items-center gap-1"><span class="iconify" data-icon="lucide:log-out"></span> Salir</button>
+    </div>
+  </header>
+  <main class="max-w-6xl mx-auto p-6">
+    <!-- Student Welcome -->
+    <div class="fade-in mb-8">
+      <div class="bg-gradient-to-r from-pri-600 to-pri-700 rounded-3xl p-8 text-white relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <div class="relative z-10">
+          <p class="text-pri-200 text-sm mb-1">¡Bienvenido/a!</p>
+          <h1 class="text-2xl md:text-3xl font-bold mb-2" id="stuWelcomeName">Estudiante</h1>
+          <div class="flex flex-wrap gap-3 mt-4">
+            <span class="bg-white/15 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium" id="stuGradeBadge">Grado</span>
+            <span class="bg-white/15 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium" id="stuSectionBadge">Sección</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Student Files -->
+    <div class="fade-in">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-gray-800">Material de mi Aula</h2>
+        <div class="relative">
+          <span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" data-icon="lucide:search"></span>
+          <input type="text" id="stuSearch" oninput="renderStudentFiles()" placeholder="Buscar..." class="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm w-48 focus:border-pri-500 transition">
+        </div>
+      </div>
+      <div id="studentFilesGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      <div id="noStudentFiles" class="hidden text-center py-16">
+        <div class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gray-100 flex items-center justify-center"><span class="iconify text-4xl text-gray-300" data-icon="lucide:folder-x"></span></div>
+        <p class="text-gray-400 font-medium">Aún no hay materiales</p>
+        <p class="text-gray-300 text-sm mt-1">Tu docente aún no ha subido archivos</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ========== MODALS ========== -->
+<!-- Create Section Modal -->
+<div id="sectionModal" class="modal-bg" onclick="if(event.target===this)closeModal('sectionModal')">
+  <div class="modal-box p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-bold text-gray-800" id="sectionModalTitle">Crear Sección</h3>
+      <button onclick="closeModal('sectionModal')" class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600"><span class="iconify" data-icon="lucide:x"></span></button>
+    </div>
+    <input type="hidden" id="secModalGrade">
+    <input type="hidden" id="secModalEditId">
+    <div class="mb-4">
+      <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Nombre de la sección</label>
+      <input type="text" id="secModalName" placeholder="Ej: Sección A, Emprendimiento, etc." class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm">
+    </div>
+    <div class="mb-5">
+      <label class="flex items-start gap-3 cursor-pointer">
+        <input type="checkbox" id="secModalPerm" class="mt-1 accent-pri-600" checked>
+        <span class="text-sm text-gray-600">Permitir a los estudiantes de esta sección <strong>ver y descargar</strong> los archivos</span>
+      </label>
+    </div>
+    <div class="flex justify-end gap-3">
+      <button onclick="closeModal('sectionModal')" class="px-5 py-2.5 text-sm text-gray-500 hover:text-gray-700">Cancelar</button>
+      <button onclick="saveSection()" class="px-6 py-2.5 bg-gradient-to-r from-pri-600 to-pri-700 text-white text-sm font-semibold rounded-xl hover:shadow-lg transition-all flex items-center gap-2"><span class="iconify" data-icon="lucide:check"></span> Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Viewer Modal -->
+<div id="viewerModal" class="modal-bg" onclick="if(event.target===this)closeModal('viewerModal')">
+  <div class="modal-box" style="max-width:900px">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div class="flex items-center gap-3 min-w-0">
+        <div id="viewerIcon" class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0"><span class="iconify text-red-500 text-xl" data-icon="lucide:file-text"></span></div>
+        <div class="min-w-0"><p class="text-sm font-semibold text-gray-800 truncate" id="viewerTitle"></p><p class="text-xs text-gray-400" id="viewerMeta"></p></div>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button onclick="downloadViewerFile()" class="w-9 h-9 rounded-lg bg-pri-50 hover:bg-pri-100 flex items-center justify-center text-pri-600 transition" title="Descargar"><span class="iconify" data-icon="lucide:download"></span></button>
+        <button onclick="closeModal('viewerModal')" class="w-9 h-9 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition"><span class="iconify" data-icon="lucide:x"></span></button>
+      </div>
+    </div>
+    <div id="viewerBody" class="p-6 overflow-auto" style="max-height:70vh"></div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div id="deleteModal" class="modal-bg" onclick="if(event.target===this)closeModal('deleteModal')">
+  <div class="modal-box p-6 text-center" style="max-width:400px">
+    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center"><span class="iconify text-3xl text-red-500" data-icon="lucide:trash-2"></span></div>
+    <h3 class="text-lg font-bold text-gray-800 mb-2">¿Eliminar?</h3>
+    <p class="text-sm text-gray-400 mb-6" id="deleteMsg">Esta acción no se puede deshacer.</p>
+    <input type="hidden" id="deleteAction">
+    <input type="hidden" id="deleteId">
+    <div class="flex gap-3 justify-center">
+      <button onclick="closeModal('deleteModal')" class="px-5 py-2.5 text-sm text-gray-500 bg-gray-100 rounded-xl hover:bg-gray-200">Cancelar</button>
+      <button onclick="confirmDelete()" class="px-5 py-2.5 text-sm text-white bg-red-500 rounded-xl hover:bg-red-600 font-semibold">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ============ DATA LAYER (localStorage) ============
+const GRADES = [
+  {id:'1',name:'1° de Secundaria',color:'g1',icon:'📘',gradient:'from-blue-500 to-blue-600'},
+  {id:'2',name:'2° de Secundaria',color:'g2',icon:'📗',gradient:'from-purple-500 to-purple-600'},
+  {id:'3',name:'3° de Secundaria',color:'g3',icon:'📙',gradient:'from-pink-500 to-pink-600'},
+  {id:'4',name:'4° de Secundaria',color:'g4',icon:'📕',gradient:'from-orange-500 to-orange-600'},
+  {id:'5',name:'5° de Secundaria',color:'g5',icon:'📓',gradient:'from-emerald-500 to-emerald-600'}
+];
+
+function getData(key, def) { try { return JSON.parse(localStorage.getItem(key)) || def; } catch(e) { return def; } }
+function setData(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+
+// Init default admin
+if (!getData('users', null)) {
+  setData('users', [{ id: 'admin', username: 'admin', password: 'admin123', name: 'Administrador', lastName: '', role: 'admin', grade: '', section: '', approved: true }]);
+}
+if (!getData('sections', null)) setData('sections', []);
+if (!getData('files', null)) setData('files', []);
+
+let currentUser = null;
+let pendingAdminFiles = [];
+let currentViewerFile = null;
+
+// ============ AUTH ============
+function showRegister() { document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.remove('hidden'); }
+function showLogin() { document.getElementById('registerForm').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); }
+
+document.getElementById('regGrade').addEventListener('change', function() {
+  const grade = this.value;
+  const sel = document.getElementById('regSection');
+  sel.innerHTML = '<option value="">Selecciona una sección</option>';
+  if (!grade) return;
+  const sections = getData('sections', []).filter(s => s.grade === grade);
+  sections.forEach(s => { const o = document.createElement('option'); o.value = s.id; o.textContent = s.name; sel.appendChild(o); });
+  if (sections.length === 0) sel.innerHTML = '<option value="">No hay secciones disponibles</option>';
+});
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if (!u || !p) return showToast('Completa todos los campos', 'error');
+  const users = getData('users', []);
+  const user = users.find(x => x.username === u && x.password === p);
+  if (!user) return showToast('Usuario o contraseña incorrectos', 'error');
+  if (user.role === 'student' && !user.approved) return showToast('Tu cuenta aún no ha sido aprobada por el administrador', 'error');
+  currentUser = user;
+  setData('currentSession', user.id);
+  if (user.role === 'admin') showAdminDashboard();
+  else showStudentDashboard();
+}
+
+function doRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const last = document.getElementById('regLast').value.trim();
+  const user = document.getElementById('regUser').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const grade = document.getElementById('regGrade').value;
+  const section = document.getElementById('regSection').value;
+  if (!name || !user || !pass || !grade || !section) return showToast('Completa todos los campos', 'error');
+  const users = getData('users', []);
+  if (users.find(x => x.username === user)) return showToast('Ese usuario ya existe', 'error');
+  users.push({ id: 'u' + Date.now(), username: user, password: pass, name, lastName: last, role: 'student', grade, section, approved: false });
+  setData('users', users);
+  showToast('¡Cuenta creada! Espera aprobación del admin.', 'success');
+  showLogin();
+}
+
+function logout() {
+  currentUser = null;
+  localStorage.removeItem('currentSession');
+  document.getElementById('adminDashboard').classList.add('hidden');
+  document.getElementById('studentDashboard').classList.add('hidden');
+  document.getElementById('authPage').classList.remove('hidden');
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+// Auto login
+(function() {
+  const sid = getData('currentSession', null);
+  if (sid) {
+    const users = getData('users', []);
+    const user = users.find(x => x.id === sid);
+    if (user) { currentUser = user; if (user.role === 'admin') showAdminDashboard(); else showStudentDashboard(); return; }
+  }
+  document.getElementById('authPage').classList.remove('hidden');
+})();
+
+// ============ ADMIN DASHBOARD ============
+function showAdminDashboard() {
+  document.getElementById('authPage').classList.add('hidden');
+  document.getElementById('studentDashboard').classList.add('hidden');
+  document.getElementById('adminDashboard').classList.remove('hidden');
+  adminNav('overview');
+}
+
+function adminNav(page) {
+  document.querySelectorAll('#adminDashboard .page').forEach(p => p.classList.remove('active'));
+  document.getElementById('admin-' + page).classList.add('active');
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  document.querySelector(`.sidebar-link[data-nav="${page}"]`).classList.add('active');
+  const titles = { overview: 'Panel de Administración', grades: 'Gestión de Aulas', files: 'Subir Archivos', students: 'Estudiantes Registrados' };
+  document.getElementById('adminTitle').textContent = titles[page] || '';
+  if (page === 'overview') renderOverview();
+  if (page === 'grades') renderGrades();
+  if (page === 'files') { loadSectionsForUpload(); renderAdminFiles(); }
+  if (page === 'students') renderStudentsAdmin();
+  // Close sidebar on mobile
+  document.getElementById('adminSidebar').classList.add('-translate-x-full');
+}
+
+function toggleSidebar(id) { document.getElementById(id).classList.toggle('-translate-x-full'); }
+
+function renderOverview() {
+  const sections = getData('sections', []);
+  const users = getData('users', []).filter(u => u.role === 'student');
+  const files = getData('files', []);
+  document.getElementById('statSections').textContent = sections.length;
+  document.getElementById('statStudentsAdmin').textContent = users.length;
+  document.getElementById('statFilesAdmin').textContent = files.length;
+  
+  const tree = document.getElementById('overviewTree');
+  tree.innerHTML = GRADES.map(g => {
+    const secs = sections.filter(s => s.grade === g.id);
+    return `<div class="border border-gray-100 rounded-xl p-4">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="text-xl">${g.icon}</span>
+        <span class="font-semibold text-gray-800 text-sm">${g.name}</span>
+        <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full ml-auto">${secs.length} sección(es)</span>
+      </div>
+      ${secs.length === 0 ? '<p class="text-xs text-gray-400 ml-9">Sin secciones creadas</p>' : 
+        secs.map(s => {
+          const stuCount = users.filter(u => u.grade === g.id && u.section === s.id).length;
+          const fileCount = files.filter(f => f.grade === g.id && f.section === s.id).length;
+          return `<div class="ml-9 flex items-center gap-2 text-xs text-gray-500 py-1">
+            <span class="iconify text-pri-400" data-icon="lucide:folder"></span>
+            <span class="font-medium text-gray-700">${s.name}</span>
+            <span class="text-gray-400">·</span><span>${stuCount} est.</span>
+            <span class="text-gray-400">·</span><span>${fileCount} arch.</span>
+            <span class="ml-auto">${s.canView ? '<span class="text-pri-500">✓ Acceso</span>' : '<span class="text-red-400">✗ Restringido</span>'}</span>
+          </div>`;
+        }).join('')
+      }
+    </div>`;
+  }).join('');
+}
+
+// ============ GRADES / SECTIONS ============
+function renderGrades() {
+  const sections = getData('sections', []);
+  const grid = document.getElementById('gradesGrid');
+  grid.innerHTML = GRADES.map(g => {
+    const secs = sections.filter(s => s.grade === g.id);
+    return `<div class="grade-card bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      <div class="bg-gradient-to-r ${g.gradient} p-5 text-white">
+        <span class="text-3xl mb-2 block">${g.icon}</span>
+        <h3 class="text-lg font-bold">${g.name}</h3>
+        <p class="text-sm text-white/70">${secs.length} sección(es)</p>
+      </div>
+      <div class="p-4">
+        ${secs.length === 0 ? '<p class="text-xs text-gray-400 text-center py-4">No hay secciones</p>' :
+          secs.map(s => `<div class="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
+            <div class="flex items-center gap-2">
+              <span class="iconify text-pri-400" data-icon="lucide:folder"></span>
+              <span class="text-sm text-gray-700 font-medium">${s.name}</span>
+              <span class="text-[10px] ${s.canView ? 'text-pri-500 bg-pri-50' : 'text-red-400 bg-red-50'} px-1.5 py-0.5 rounded">${s.canView ? 'Acceso' : 'Restringido'}</span>
+            </div>
+            <div class="flex gap-1">
+              <button onclick="editSection('${s.id}','${g.id}','${s.name}',${s.canView})" class="w-7 h-7 rounded-lg bg-gray-50 hover:bg-pri-50 flex items-center justify-center text-gray-400 hover:text-pri-600 transition" title="Editar"><span class="iconify text-xs" data-icon="lucide:pencil"></span></button>
+              <button onclick="askDelete('section','${s.id}')" class="w-7 h-7 rounded-lg bg-gray-50 hover:bg-red-50 flex items-center justify-center text-gray-400 hover:text-red-500 transition" title="Eliminar"><span class="iconify text-xs" data-icon="lucide:trash-2"></span></button>
+            </div>
+          </div>`).join('')
+        }
+        <button onclick="openSectionModal('${g.id}')" class="w-full mt-3 py-2.5 border-2 border-dashed border-gray-200 rounded-xl text-xs font-semibold text-gray-400 hover:border-pri-400 hover:text-pri-600 hover:bg-pri-50/50 transition flex items-center justify-center gap-1.5">
+          <span class="iconify" data-icon="lucide:plus"></span> Agregar Sección
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openSectionModal(gradeId, editId, editName, editPerm) {
+  document.getElementById('secModalGrade').value = gradeId;
+  document.getElementById('secModalEditId').value = editId || '';
+  document.getElementById('secModalName').value = editName || '';
+  document.getElementById('secModalPerm').checked = editId ? editPerm : true;
+  document.getElementById('sectionModalTitle').textContent = editId ? 'Editar Sección' : 'Crear Sección';
+  openModal('sectionModal');
+  setTimeout(() => document.getElementById('secModalName').focus(), 200);
+}
+
+function editSection(id, grade, name, perm) { openSectionModal(grade, id, name, perm); }
+
+function saveSection() {
+  const grade = document.getElementById('secModalGrade').value;
+  const name = document.getElementById('secModalName').value.trim();
+  const perm = document.getElementById('secModalPerm').checked;
+  const editId = document.getElementById('secModalEditId').value;
+  if (!name) return showToast('Ingresa un nombre para la sección', 'error');
+  let sections = getData('sections', []);
+  if (editId) {
+    sections = sections.map(s => s.id === editId ? {...s, name, canView: perm} : s);
+  } else {
+    sections.push({ id: 'sec' + Date.now(), grade, name, canView: perm });
+  }
+  setData('sections', sections);
+  closeModal('sectionModal');
+  renderGrades();
+  showToast(editId ? 'Sección actualizada' : 'Sección creada', 'success');
+}
+
+// ============ ADMIN FILES ============
+function loadSectionsForUpload() {
+  const grade = document.getElementById('upGrade').value;
+  const sel = document.getElementById('upSection');
+  sel.innerHTML = '<option value="">Selecciona una sección</option>';
+  if (!grade) return;
+  getData('sections', []).filter(s => s.grade === grade).forEach(s => {
+    const o = document.createElement('option'); o.value = s.id; o.textContent = s.name; sel.appendChild(o);
+  });
+}
+
+const adminDZ = document.getElementById('adminDropZone');
+const adminFI = document.getElementById('adminFileInput');
+['dragenter','dragover'].forEach(e => adminDZ.addEventListener(e, ev => { ev.preventDefault(); adminDZ.classList.add('drag-over'); }));
+['dragleave','drop'].forEach(e => adminDZ.addEventListener(e, ev => { ev.preventDefault(); adminDZ.classList.remove('drag-over'); }));
+adminDZ.addEventListener('drop', e => handleAdminFiles(e.dataTransfer.files));
+adminFI.addEventListener('change', e => handleAdminFiles(e.target.files));
+
+function handleAdminFiles(fl) {
+  if (!fl.length) return;
+  pendingAdminFiles = Array.from(fl);
+  const preview = document.getElementById('adminFilePreview');
+  preview.innerHTML = pendingAdminFiles.map(f => {
+    const t = getType(f.name); const ic = getIcon(t);
+    return `<div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100"><div class="${ic.bg} w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify ${ic.color}" data-icon="${ic.icon}"></span></div><div class="flex-1 min-w-0"><p class="text-sm font-medium text-gray-700 truncate">${f.name}</p><p class="text-xs text-gray-400">${fmtSize(f.size)}</p></div></div>`;
+  }).join('');
+  document.getElementById('adminUploadBtn').classList.remove('hidden');
+}
+
+function doAdminUpload() {
+  const grade = document.getElementById('upGrade').value;
+  const section = document.getElementById('upSection').value;
+  const desc = document.getElementById('upDesc').value.trim();
+  if (!grade || !section) return showToast('Selecciona grado y sección', 'error');
+  if (!pendingAdminFiles.length) return showToast('No hay archivos para subir', 'error');
+
+  document.getElementById('adminDropContent').classList.add('hidden');
+  document.getElementById('adminUploadProgress').classList.remove('hidden');
+  let prog = 0;
+  const iv = setInterval(() => {
+    prog += Math.random() * 30 + 10;
+    if (prog >= 100) {
+      prog = 100; clearInterval(iv);
+      document.getElementById('adminUpSpinner').classList.remove('animate-spin');
+      document.getElementById('adminUpSpinner').setAttribute('data-icon','lucide:check-circle');
+      document.getElementById('adminUpSpinner').classList.add('text-green-500');
+      document.getElementById('adminUpText').textContent = '¡Publicado!';
+      setTimeout(() => {
+        let files = getData('files', []);
+        let processed = 0;
+        pendingAdminFiles.forEach(f => {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const t = getType(f.name);
+            files.push({ id:'f'+Date.now()+processed, name:f.name, type:t, size:f.size, grade, section, desc, date:new Date().toISOString(), downloads:0, dataUrl:e.target.result });
+            processed++;
+            if (processed === pendingAdminFiles.length) { setData('files', files); renderAdminFiles(); showToast(`${processed} archivo(s) publicados`, 'success'); }
+          };
+          reader.readAsDataURL(f);
+        });
+        resetAdminUpload();
+      }, 600);
+    }
+    document.getElementById('adminUpBar').style.width = prog + '%';
+  }, 200);
+}
+
+function resetAdminUpload() {
+  document.getElementById('adminDropContent').classList.remove('hidden');
+  document.getElementById('adminUploadProgress').classList.add('hidden');
+  document.getElementById('adminUpBar').style.width = '0%';
+  document.getElementById('adminUpSpinner').setAttribute('data-icon','lucide:loader-2');
+  document.getElementById('adminUpSpinner').classList.remove('text-green-500');
+  document.getElementById('adminUpSpinner').classList.add('animate-spin');
+  document.getElementById('adminUpText').textContent = 'Subiendo...';
+  document.getElementById('adminFilePreview').innerHTML = '';
+  document.getElementById('adminUploadBtn').classList.add('hidden');
+  adminFI.value = ''; pendingAdminFiles = [];
+}
+
+function renderAdminFiles() {
+  const files = getData('files', []);
+  const sections = getData('sections', []);
+  const list = document.getElementById('adminFilesList');
+  if (!files.length) { list.innerHTML = '<p class="text-sm text-gray-400 text-center py-8">No hay archivos subidos</p>'; return; }
+  list.innerHTML = files.slice().reverse().map(f => {
+    const grade = GRADES.find(g => g.id === f.grade);
+    const sec = sections.find(s => s.id === f.section);
+    const ic = getIcon(f.type);
+    return `<div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 hover:shadow-sm transition slide-r">
+      <div class="${ic.bg} w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify ${ic.color}" data-icon="${ic.icon}"></span></div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-gray-700 truncate">${f.name}</p>
+        <p class="text-xs text-gray-400">${grade?.icon || ''} ${grade?.name || '?'} · ${sec?.name || '?'} · ${fmtSize(f.size)} · ↓${f.downloads}</p>
+      </div>
+      <div class="flex gap-1">
+        <button onclick="viewFile('${f.id}','admin')" class="w-8 h-8 rounded-lg bg-pri-50 hover:bg-pri-100 flex items-center justify-center text-pri-600 transition" title="Ver"><span class="iconify text-sm" data-icon="lucide:eye"></span></button>
+        <button onclick="askDelete('file','${f.id}')" class="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 flex items-center justify-center text-red-400 transition" title="Eliminar"><span class="iconify text-sm" data-icon="lucide:trash-2"></span></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============ ADMIN STUDENTS ============
+function renderStudentsAdmin() {
+  const users = getData('users', []).filter(u => u.role === 'student');
+  const gradeFilter = document.getElementById('filterStuGrade').value;
+  const sections = getData('sections', []);
+  const filtered = gradeFilter === 'all' ? users : users.filter(u => u.grade === gradeFilter);
+  const tbody = document.getElementById('studentsTableBody');
+  document.getElementById('noStudents').classList.toggle('hidden', filtered.length > 0);
+  tbody.innerHTML = filtered.map(u => {
+    const grade = GRADES.find(g => g.id === u.grade);
+    const sec = sections.find(s => s.id === u.section);
+    return `<tr class="border-b border-gray-50 hover:bg-gray-50/50 transition">
+      <td class="px-5 py-3 font-medium text-gray-800">${u.name} ${u.lastName || ''}</td>
+      <td class="px-5 py-3 text-gray-500">${u.username}</td>
+      <td class="px-5 py-3"><span class="text-xs">${grade?.icon||''} ${grade?.name||'?'}</span></td>
+      <td class="px-5 py-3 text-gray-500">${sec?.name||'—'}</td>
+      <td class="px-5 py-3">${u.approved ? '<span class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">Aprobado</span>' : '<span class="text-xs bg-yellow-50 text-yellow-600 px-2 py-0.5 rounded-full font-medium">Pendiente</span>'}</td>
+      <td class="px-5 py-3">
+        <div class="flex gap-1">
+          ${!u.approved ? `<button onclick="approveStudent('${u.id}')" class="text-xs bg-pri-50 text-pri-600 px-2.5 py-1 rounded-lg hover:bg-pri-100 font-medium transition" title="Aprobar">✓ Aprobar</button>` : ''}
+          <button onclick="askDelete('student','${u.id}')" class="text-xs bg-red-50 text-red-400 px-2.5 py-1 rounded-lg hover:bg-red-100 font-medium transition" title="Eliminar">✗</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function approveStudent(id) {
+  let users = getData('users', []);
+  users = users.map(u => u.id === id ? {...u, approved: true} : u);
+  setData('users', users);
+  renderStudentsAdmin();
+  showToast('Estudiante aprobado', 'success');
+}
+
+// ============ STUDENT DASHBOARD ============
+function showStudentDashboard() {
+  document.getElementById('authPage').classList.add('hidden');
+  document.getElementById('adminDashboard').classList.add('hidden');
+  document.getElementById('studentDashboard').classList.remove('hidden');
+  const sections = getData('sections', []);
+  const sec = sections.find(s => s.id === currentUser.section);
+  const grade = GRADES.find(g => g.id === currentUser.grade);
+  document.getElementById('stuWelcomeName').textContent = `${currentUser.name} ${currentUser.lastName || ''}`;
+  document.getElementById('stuGradeBadge').textContent = `${grade?.icon || ''} ${grade?.name || 'Sin grado'}`;
+  document.getElementById('stuSectionBadge').textContent = `📁 ${sec?.name || 'Sin sección'}`;
+  document.getElementById('stuInfoBadge').textContent = `${currentUser.name} · ${grade?.name || ''} · ${sec?.name || ''}`;
+  renderStudentFiles();
+}
+
+function renderStudentFiles() {
+  const search = (document.getElementById('stuSearch')?.value || '').toLowerCase();
+  let files = getData('files', []).filter(f => f.grade === currentUser.grade && f.section === currentUser.section);
+  // Check permission
+  const sections = getData('sections', []);
+  const sec = sections.find(s => s.id === currentUser.section);
+  if (sec && !sec.canView) files = [];
+  
+  if (search) files = files.filter(f => f.name.toLowerCase().includes(search) || (f.desc||'').toLowerCase().includes(search));
+  
+  const grid = document.getElementById('studentFilesGrid');
+  document.getElementById('noStudentFiles').classList.toggle('hidden', files.length > 0);
+  grid.innerHTML = files.slice().reverse().map(f => {
+    const ic = getIcon(f.type);
+    const isImg = f.type === 'image';
+    return `<div class="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 slide-r">
+      <div class="h-36 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden cursor-pointer relative" onclick="viewFile('${f.id}','student')">
+        ${isImg ? `<img src="${f.dataUrl}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">` : 
+        `<div class="flex items-center justify-center h-full"><div class="${ic.bg} w-14 h-14 rounded-2xl flex items-center justify-center"><span class="iconify text-2xl ${ic.color}" data-icon="${ic.icon}"></span></div></div>`}
+        <span class="absolute top-2 left-2 px-2 py-0.5 bg-white/90 backdrop-blur-sm rounded-md text-[10px] font-semibold text-gray-600">${f.type.toUpperCase()}</span>
+      </div>
+      <div class="p-4">
+        <h4 class="text-sm font-semibold text-gray-800 truncate mb-1 cursor-pointer hover:text-pri-600 transition" onclick="viewFile('${f.id}','student')">${f.name}</h4>
+        ${f.desc ? `<p class="text-xs text-gray-400 line-clamp-2 mb-3">${f.desc}</p>` : '<div class="mb-3"></div>'}
+        <div class="flex items-center justify-between pt-3 border-t border-gray-50">
+          <span class="text-[10px] text-gray-400">${fmtSize(f.size)} · ↓${f.downloads}</span>
+          <div class="flex gap-1.5">
+            <button onclick="viewFile('${f.id}','student')" class="px-3 py-1.5 text-xs font-semibold text-pri-600 bg-pri-50 rounded-lg hover:bg-pri-100 transition flex items-center gap-1"><span class="iconify" data-icon="lucide:eye"></span> Ver</button>
+            <button onclick="downloadFileById('${f.id}')" class="px-3 py-1.5 text-xs font-semibold text-acc-600 bg-acc-50 rounded-lg hover:bg-acc-100 transition flex items-center gap-1"><span class="iconify" data-icon="lucide:download"></span></button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============ FILE VIEWER ============
+function viewFile(id, from) {
+  const files = getData('files', []);
+  const file = files.find(f => f.id === id);
+  if (!file) return;
+  currentViewerFile = file;
+  const ic = getIcon(file.type);
+  document.getElementById('viewerIcon').className = `w-10 h-10 rounded-xl ${ic.bg} flex items-center justify-center flex-shrink-0`;
+  document.getElementById('viewerIcon').innerHTML = `<span class="iconify text-xl ${ic.color}" data-icon="${ic.icon}"></span>`;
+  document.getElementById('viewerTitle').textContent = file.name;
+  document.getElementById('viewerMeta').textContent = `${file.type.toUpperCase()} · ${fmtSize(file.size)} · ↓${file.downloads}`;
+  const body = document.getElementById('viewerBody');
+  if (file.type === 'image') {
+    body.innerHTML = `<div class="flex items-center justify-center"><img src="${file.dataUrl}" class="max-w-full max-h-[60vh] rounded-xl shadow-lg object-contain"></div>`;
+  } else if (file.type === 'pdf' && file.dataUrl) {
+    body.innerHTML = `<iframe src="${file.dataUrl}" class="w-full h-[60vh] rounded-xl border border-gray-200"></iframe>`;
+  } else if (file.type === 'txt' && file.dataUrl) {
+    body.innerHTML = `<pre class="bg-gray-50 rounded-xl p-6 text-sm text-gray-700 whitespace-pre-wrap font-mono leading-relaxed max-h-[60vh] overflow-auto border border-gray-200">${atob(file.dataUrl.split(',')[1])}</pre>`;
+  } else {
+    body.innerHTML = `<div class="text-center py-12"><div class="${ic.bg} w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4"><span class="iconify text-4xl ${ic.color}" data-icon="${ic.icon}"></span></div><h3 class="text-lg font-bold text-gray-800 mb-2">${file.name}</h3>${file.desc ? `<p class="text-sm text-gray-400 mb-4">${file.desc}</p>` : ''}<p class="text-xs text-yellow-600 bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 inline-block"><span class="iconify inline mr-1 align-middle" data-icon="lucide:info"></span>Descarga el archivo para ver su contenido completo</p></div>`;
+  }
+  openModal('viewerModal');
+}
+
+function downloadViewerFile() { if (currentViewerFile) downloadFileById(currentViewerFile.id); }
+
+function downloadFileById(id) {
+  const files = getData('files', []);
+  const file = files.find(f => f.id === id);
+  if (!file) return;
+  if (file.dataUrl) {
+    const a = document.createElement('a'); a.href = file.dataUrl; a.download = file.name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  } else {
+    showToast('Descargando: ' + file.name, 'info');
+  }
+  file.downloads++;
+  setData('files', files);
+  if (currentUser && currentUser.role === 'student') renderStudentFiles();
+  else renderAdminFiles();
+  showToast('Descarga completada', 'success');
+}
+
+// ============ DELETE ============
+function askDelete(action, id) {
+  document.getElementById('deleteAction').value = action;
+  document.getElementById('deleteId').value = id;
+  const msgs = { section: 'Se eliminará la sección y los archivos asociados.', file: 'Se eliminará el archivo permanentemente.', student: 'Se eliminará el estudiante del sistema.' };
+  document.getElementById('deleteMsg').textContent = msgs[action] || '';
+  openModal('deleteModal');
+}
+
+function confirmDelete() {
+  const action = document.getElementById('deleteAction').value;
+  const id = document.getElementById('deleteId').value;
+  if (action === 'section') {
+    let sections = getData('sections', []).filter(s => s.id !== id);
+    let files = getData('files', []).filter(f => f.section !== id);
+    setData('sections', sections); setData('files', files);
+    renderGrades(); renderOverview();
+  } else if (action === 'file') {
+    let files = getData('files', []).filter(f => f.id !== id);
+    setData('files', files); renderAdminFiles();
+  } else if (action === 'student') {
+    let users = getData('users', []).filter(u => u.id !== id);
+    setData('users', users); renderStudentsAdmin();
+  }
+  closeModal('deleteModal');
+  showToast('Eliminado correctamente', 'success');
+}
+
+// ============ HELPERS ============
+function fmtSize(b) { if(b<1024)return b+' B'; if(b<1048576)return(b/1024).toFixed(1)+' KB'; return(b/1048576).toFixed(1)+' MB'; }
+function getType(name) { const ext=name.split('.').pop().toLowerCase(); if(['jpg','jpeg','png','gif','webp','svg'].includes(ext))return'image'; if(ext==='pdf')return'pdf'; if(['doc','docx'].includes(ext))return'doc'; if(['ppt','pptx'].includes(ext))return'ppt'; if(['xls','xlsx'].includes(ext))return'xls'; return'txt'; }
+function getIcon(t) {
+  return { pdf:{icon:'lucide:file-text',bg:'bg-red-100',color:'text-red-500'}, doc:{icon:'lucide:file-text',bg:'bg-blue-100',color:'text-blue-500'}, ppt:{icon:'lucide:presentation',bg:'bg-orange-100',color:'text-orange-500'}, xls:{icon:'lucide:table',bg:'bg-green-100',color:'text-green-500'}, image:{icon:'lucide:image',bg:'bg-purple-100',color:'text-purple-500'}, txt:{icon:'lucide:file',bg:'bg-gray-100',color:'text-gray-500'} }[t]||{icon:'lucide:file',bg:'bg-gray-100',color:'text-gray-500'};
+}
+function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow='hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow=''; if(id==='viewerModal')currentViewerFile=null; }
+function showToast(msg,type='success') {
+  const t=document.getElementById('toast'); const icons={success:'lucide:check-circle',error:'lucide:alert-circle',info:'lucide:info'};
+  t.className=`toast toast-${type}`; t.innerHTML=`<span class="iconify" data-icon="${icons[type]}"></span>${msg}`; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('viewerModal');closeModal('sectionModal');closeModal('deleteModal');}});
+</script>
+</body>
+</html>
